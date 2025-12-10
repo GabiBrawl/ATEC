@@ -23,3 +23,27 @@ Outras Opcoes:
 Insira uma opção >  
 
 */
+
+#include <vector>
+#include <string>
+#include <iostream>
+#include <ctime> // Para a data automática
+
+int choice;
+
+void main() {
+    while (true) {
+        mainMenu();
+    }
+};
+
+void mainMenu() {
+    cout << "                   - Sweet Land -\n\n";
+    cout << " Produtos:\n";
+
+    cin >> choice;
+};
+
+void checkoutMenu() {};
+
+void receiptMenu() {};
