@@ -1,0 +1,8 @@
+[
+  {
+    "key": "ctrl+shift+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "C/C++: g++ build active file",
+    "when": "editorTextFocus"
+  }
+]

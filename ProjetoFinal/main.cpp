@@ -1,5 +1,4 @@
 /*
-
                     - Sweet Land -
 Produtos:
 	1) Gomas .......... 3.50
@@ -21,34 +20,48 @@ Outras Opcoes:
 	z) Adicionar produtos disponíveis
 
 Insira uma opção >  
-
 */
 
+#include <stdio.h>
 #include <vector>
 #include <string>
 #include <iostream>
 #include <ctime> // Para a data automática
 
+using namespace std;
+
+void checkoutMenu() {};
+void receiptMenu() {};
+int mainMenu();
+inline void clearScreen() { cout << "\x1B[2J\x1B[H"; }
+
 int choice;
 
-int produtos[2][2] = {
+struct Produto {
+    char nome[20];
+    float preco;
+};
+
+struct Produto produtos[2] = {
     {"Bolo", 1.5},
     {"Gomas", 0.3}
 };
 
-void main() {
+int main() {
     while (true) {
         mainMenu();
     }
 };
 
-void mainMenu() {
+int mainMenu() {
+	clearScreen();
     cout << "                   - Sweet Land -\n\n";
     cout << " Produtos:\n";
 
+	// Tens de substituir aqui esta linha pelo tal loop para escrever todos os produtos no menu
+	printf("Item: %s, Preco: %.2f\n", produtos[0].nome, produtos[0].preco);
+
     cin >> choice;
+
+	return 0;
 };
-
-void checkoutMenu() {};
-
-void receiptMenu() {};
