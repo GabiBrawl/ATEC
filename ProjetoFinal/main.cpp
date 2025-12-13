@@ -30,6 +30,9 @@ int main() {
     }
 };
 
+// -------------------------------------- MENU INICIAL ---------------------------------------
+
+
 int mainMenu() {
 	clearScreen();
     cout << "                   - Sweet Land -";
@@ -52,12 +55,14 @@ int mainMenu() {
 	return choice;
 };
 
+// -------------------------------------- CHECKOUT ---------------------------------------
+
 
 int checkoutMenu() {
-
-
 	return 0;
 };
+
+// -------------------------------------- RECIBO ---------------------------------------
 
 int receiptMenu() {
 	clearScreen();
