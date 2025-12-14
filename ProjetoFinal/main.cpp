@@ -5,12 +5,13 @@
 #include <ctime> // Para a data automática
 #include <iomanip>
 #include <cstring>
+#include <cstdlib> // Para rand() e srand()
 
 
 using namespace std;
 
 int mainMenu();
-int receiptMenu(int num_cliente, float dinheiro_entregue, float troco, float subtotal, float iva, float total);
+int receiptMenu(int num_cliente, float dinheiro_entregue, float troco, float subtotal, float iva, float total, bool gratis = false);
 int checkoutMenu();
 int adicionarItem(int index);
 int gerirProdutosMenu();
@@ -19,18 +20,24 @@ inline void clearScreen() { cout << "\x1B[2J\x1B[H"; }
 
 char choice;
 int numero_talao = 1000;
+int total_compras = 0; // Contador de compras
 
 struct Produto {
     char nome[20];
     float preco_obtencao;
-    float preco_venda;
     int stock;
+    
+    // Calculate selling price automatically (30% profit)
+    float preco_venda() const {
+        return preco_obtencao * 1.30f;
+    }
 };
 
 vector<Produto> produtos = {
-    {"Bolo", 1.15, 1.50, 50},
-    {"Gomas", 0.23, 0.30, 100},
-    {"Chocapix", 11.54, 15.00, 30}
+    {"Bolo", 1.15, 50},
+    {"Gomas", 0.23, 100},
+    {"Chocapix", 1.54, 30},
+	{"Ferrero Roche 6un", 5.24, 1000}
 };
 
 struct ItemCarrinho {
@@ -41,6 +48,9 @@ struct ItemCarrinho {
 vector<ItemCarrinho> carrinho;
 
 int main() {
+	// Initialize random seed
+	srand(time(0));
+	
     while (true) {
         choice = mainMenu();
 	
@@ -84,7 +94,7 @@ int adicionarItem(int index) {
 	// Show product and ask for quantity
 	clearScreen();
 	cout << "\n  Produto selecionado: " << produtos[index].nome;
-	cout << "\n  Preco unitario: " << fixed << setprecision(2) << produtos[index].preco_venda << " EUR\n";
+	cout << "\n  Preco unitario: " << fixed << setprecision(2) << produtos[index].preco_venda() << " EUR\n";
 	cout << "\n  Stock disponivel: " << produtos[index].stock << "\n";
 	cout << "\n  Quantos deseja adicionar? (numero negativo para remover) > ";
 	
@@ -159,7 +169,7 @@ int mainMenu() {
     cout << "\n\n  Produtos:\n";
 
     for (int i = 0; i < produtos.size(); ++i) {
-        printf("   %d) %s, Preco: %.2f EUR (Stock: %d)\n", i + 1, produtos[i].nome, produtos[i].preco_venda, produtos[i].stock);
+        printf("   %d) %s, Preco: %.3f EUR (Stock: %d)\n", i + 1, produtos[i].nome, produtos[i].preco_venda(), produtos[i].stock);
     }
 
     cout << "\n\n  Carrinho:\n";
@@ -168,7 +178,7 @@ int mainMenu() {
     } else {
         float total = 0;
         for (int i = 0; i < carrinho.size(); i++) {
-            float subtotal = carrinho[i].produto.preco_venda * carrinho[i].quantidade;
+            float subtotal = carrinho[i].produto.preco_venda() * carrinho[i].quantidade;
             printf("   %s x%d - %.2f EUR\n", 
                    carrinho[i].produto.nome, 
                    carrinho[i].quantidade, 
@@ -201,7 +211,7 @@ int checkoutMenu() {
 	// Calculate totals
 	float subtotal = 0;
 	for (int i = 0; i < carrinho.size(); i++) {
-		subtotal += carrinho[i].produto.preco_venda * carrinho[i].quantidade;
+		subtotal += carrinho[i].produto.preco_venda() * carrinho[i].quantidade;
 	}
 	float iva = subtotal * 0.23;
 	float total = subtotal + iva;
@@ -212,7 +222,7 @@ int checkoutMenu() {
 	
 	// Show cart items
 	for (int i = 0; i < carrinho.size(); i++) {
-		float item_total = carrinho[i].produto.preco_venda * carrinho[i].quantidade;
+		float item_total = carrinho[i].produto.preco_venda() * carrinho[i].quantidade;
 		printf("%-20s   %2dx    %6.2f EUR\n", 
 		       carrinho[i].produto.nome, 
 		       carrinho[i].quantidade, 
@@ -254,8 +264,27 @@ int checkoutMenu() {
 	
 	float troco = dinheiro_entregue - total;
 	
+	// Check for free receipt (60% chance on even receipt numbers)
+	bool gratis = false;
+	if (numero_talao % 2 == 0) {
+		// Generate random number between 0-99
+		int chance = rand() % 100;
+		if (chance < 60) { // 60% chance
+			gratis = true;
+			troco = dinheiro_entregue; // Return all money
+		}
+	}
+	
 	// Show receipt
-	receiptMenu(num_cliente, dinheiro_entregue, troco, subtotal, iva, total);
+	receiptMenu(num_cliente, dinheiro_entregue, troco, subtotal, iva, total, gratis);
+	
+	// Increment purchase counter
+	total_compras++;
+	
+	// Rickroll on 3rd purchase
+	if (total_compras == 2) {
+		system("xdg-open https://www.youtube.com/watch?v=dQw4w9WgXcQ &");
+	}
 	
 	// Clear cart and increment receipt number
 	carrinho.clear();
@@ -265,7 +294,7 @@ int checkoutMenu() {
 };
 
 // -------------------------------------- RECIBO ---------------------------------------
-int receiptMenu(int num_cliente, float dinheiro_entregue, float troco, float subtotal, float iva, float total) {
+int receiptMenu(int num_cliente, float dinheiro_entregue, float troco, float subtotal, float iva, float total, bool gratis) {
 	clearScreen();
 	
 	// Get current date/time
@@ -280,7 +309,14 @@ int receiptMenu(int num_cliente, float dinheiro_entregue, float troco, float sub
 	cout << "========================================\n";
 	cout << "\n";
 	cout << "Talao N: " << numero_talao << "\n";
-	cout << "Cliente N: " << num_cliente << "\n";
+	cout << "Cliente N: " << num_cliente;
+	
+	// Easter egg for special customer
+	if (num_cliente == 890) {
+		cout << " - JORGEEEEE";
+	}
+	cout << "\n";
+	
 	cout << "Data: " << setfill('0') << setw(2) << ltm->tm_mday << "/"
 	     << setw(2) << 1 + ltm->tm_mon << "/"
 	     << 1900 + ltm->tm_year << "\n";
@@ -294,7 +330,7 @@ int receiptMenu(int num_cliente, float dinheiro_entregue, float troco, float sub
 	
 	// Show cart items
 	for (int i = 0; i < carrinho.size(); i++) {
-		float item_total = carrinho[i].produto.preco_venda * carrinho[i].quantidade;
+		float item_total = carrinho[i].produto.preco_venda() * carrinho[i].quantidade;
 		printf("%-20s   %2dx    %6.2f\n", 
 		       carrinho[i].produto.nome, 
 		       carrinho[i].quantidade, 
@@ -305,10 +341,23 @@ int receiptMenu(int num_cliente, float dinheiro_entregue, float troco, float sub
 	printf("Subtotal (sem IVA):            %6.2f\n", subtotal);
 	printf("IVA (23%%):                     %6.2f\n", iva);
 	cout << "----------------------------------------\n";
-	printf("TOTAL:                         %6.2f EUR\n", total);
-	cout << "========================================\n";
-	printf("Dinheiro entregue:             %6.2f EUR\n", dinheiro_entregue);
-	printf("Troco:                         %6.2f EUR\n", troco);
+	
+	if (gratis) {
+		cout << "\n";
+		cout << "*** PARABENS! TALAO GRATIS! ***\n";
+		cout << "   Voce teve sorte hoje!\n";
+		cout << "\n";
+		printf("TOTAL:                         %6.2f EUR\n", 0.0f);
+		cout << "========================================\n";
+		printf("Dinheiro entregue:             %6.2f EUR\n", dinheiro_entregue);
+		printf("Troco:                         %6.2f EUR\n", dinheiro_entregue);
+	} else {
+		printf("TOTAL:                         %6.2f EUR\n", total);
+		cout << "========================================\n";
+		printf("Dinheiro entregue:             %6.2f EUR\n", dinheiro_entregue);
+		printf("Troco:                         %6.2f EUR\n", troco);
+	}
+	
 	cout << "========================================\n";
 	cout << "\n";
 	cout << "   Obrigado pela sua compra!\n";
@@ -337,7 +386,7 @@ int gerirProdutosMenu() {
 			       i + 1, 
 			       produtos[i].nome, 
 			       produtos[i].preco_obtencao,
-			       produtos[i].preco_venda,
+			       produtos[i].preco_venda(),
 			       produtos[i].stock);
 		}
 		
@@ -377,9 +426,6 @@ int gerirProdutosMenu() {
 				continue;
 			}
 			
-			// Calculate selling price with 30% profit
-			novo.preco_venda = novo.preco_obtencao * 1.30;
-			
 			cout << "Quantidade em stock: ";
 			cin >> novo.stock;
 			
@@ -394,7 +440,7 @@ int gerirProdutosMenu() {
 			
 			produtos.push_back(novo);
 			cout << "\nProduto adicionado com sucesso!";
-			cout << "\nPreco de venda calculado: " << fixed << setprecision(2) << novo.preco_venda << " EUR";
+			cout << "\nPreco de venda calculado: " << fixed << setprecision(2) << novo.preco_venda() << " EUR";
 			cout << "\n\nPressione Enter...";
 			cin.ignore();
 			cin.get();
