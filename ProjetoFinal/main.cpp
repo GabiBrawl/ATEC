@@ -25,6 +25,8 @@ struct Produto produtos[2] = {
 };
 
 int main() {
+	receiptMenu();
+
     while (true) {
         mainMenu();
     }
@@ -106,7 +108,6 @@ int receiptMenu() {
 	cout << "\n";
 	cout << "========================================\n";
 	cout << "\nPressione Enter para continuar...";
-	cin.ignore();
 	cin.get();
 	
 	return 0;
