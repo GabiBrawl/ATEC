@@ -20,7 +20,6 @@ inline void clearScreen() { cout << "\x1B[2J\x1B[H"; }
 
 char choice;
 int numero_talao = 1000;
-int total_compras = 0;
 
 // ============================== STRUCTS ==============================
 struct Produto {
@@ -249,9 +248,8 @@ void checkoutMenu() {
 
     carrinho.clear();
     numero_talao++;
-    total_compras++;
 
-    if (total_compras == 2) {
+    if (numero_talao == 1002) {
         system("xdg-open https://www.youtube.com/watch?v=dQw4w9WgXcQ &");
     }
 }
