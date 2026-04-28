@@ -42,7 +42,23 @@ while True:  # loop principal: repete até obter uma entrada válida
         continue  # repete o pedido
     break  # todas as verificações passaram: sai do loop
 
-print(ports)  # imprime a lista de portas válidas (inteiros)
+# Comparar com as portas padrão e reportar anomalias
+anomaly_report = []  # variável para guardar as portas suspeitas
 
+for port in ports:
+    # Converter porta para string para comparação com constantes
+    port_str = str(port)
+    
+    # Verificar se a porta é uma das padrões
+    if port_str != PORT_HTTP and port_str != PORT_HTTPS and port_str != PORT_SSH:
+        # Se não coincidir com nenhuma constante, adicionar ao relatório
+        anomaly_report.append(port)
 
+# Imprimir resultado
+print("\nPortas válidas:", ports)  # imprime a lista de portas válidas (inteiros)
+print("Portas padrão esperadas: HTTP(" + PORT_HTTP + "), HTTPS(" + PORT_HTTPS + "), SSH(" + PORT_SSH + ")")
 
+if anomaly_report:
+    print("Portas suspeitas encontradas:", anomaly_report)
+else:
+    print("Todas as portas correspondem às portas padrão.")
