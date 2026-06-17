@@ -1,4 +1,4 @@
-# Projetos da ATEC do Gabriel
+# Projetos da ATEC do Gabriel & Companhia kk
 
 Este repositório contém os projetos desenvolvidos durante o curso na ATEC.
 
