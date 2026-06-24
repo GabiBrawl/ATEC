@@ -1,10 +1,9 @@
 import re
 import sys
-from typing import Optional, Set  # Adicionámos Set aqui
+from typing import Optional, Set  
 import whitelist
 from classify import classify_event
 
-# 1. Alterar a assinatura para receber a 'whitelist_set' (o conjunto de IPs)
 def process_log_file(log_path: str, whitelist_set: Set[str]) -> None:
     try:
         with open(log_path, 'r', encoding='utf-8') as f:
@@ -17,7 +16,6 @@ def process_log_file(log_path: str, whitelist_set: Set[str]) -> None:
                     continue
                 timestamp, ip, message = parsed
 
-                # 2. Corrigido: verificar se o IP está no CONJUNTO recebido, não no módulo
                 if ip in whitelist_set:
                     continue
                 try:
