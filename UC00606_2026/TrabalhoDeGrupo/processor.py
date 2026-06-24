@@ -1,6 +1,7 @@
 import re
 import sys
 from typing import Optional
+import whitelist
 
 def process_log_file(log_path: str) -> None:
     try:
@@ -13,6 +14,9 @@ def process_log_file(log_path: str) -> None:
                 if not parsed:
                     continue
                 timestamp, ip, message = parsed
+
+                if ip in whitelist:
+                    continue
     except FileNotFoundError:
         print(f"Erro: Ficheiro '{log_path}' nao encontrado.")
         sys.exit(1)
