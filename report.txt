@@ -1,0 +1,13 @@
+=== RELATÓRIO DE ANÁLISE DE AMEAÇAS ===
+
+Total de ameaças instanciadas: 76
+
+IPs com força bruta (5+ falhas de autenticação):
+  - 192.168.1.50
+
+Top 3 IPs com maior risco acumulado:
+  1. 192.168.1.50 -> Risco: 730
+  2. 172.16.0.8 -> Risco: 335
+  3. 203.0.113.42 -> Risco: 324
+
+Fim do relatório.
