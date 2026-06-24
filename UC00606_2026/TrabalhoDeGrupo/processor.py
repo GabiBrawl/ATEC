@@ -2,6 +2,7 @@ import re
 import sys
 from typing import Optional
 import whitelist
+import classify
 
 def process_log_file(log_path: str) -> None:
     try:
@@ -17,6 +18,12 @@ def process_log_file(log_path: str) -> None:
 
                 if ip in whitelist:
                     continue
+                try:
+                    event = classify_event(timestamp, ip, message)
+                    if event:
+                        analyzer.add_event(event)
+                except ValueError as e:
+                    pass    
     except FileNotFoundError:
         print(f"Erro: Ficheiro '{log_path}' nao encontrado.")
         sys.exit(1)
