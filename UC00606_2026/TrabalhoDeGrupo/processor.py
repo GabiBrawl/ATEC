@@ -1,10 +1,11 @@
 import re
 import sys
-from typing import Optional
+from typing import Optional, Set  # Adicionámos Set aqui
 import whitelist
-import classify
+from classify import classify_event
 
-def process_log_file(log_path: str) -> None:
+# 1. Alterar a assinatura para receber a 'whitelist_set' (o conjunto de IPs)
+def process_log_file(log_path: str, whitelist_set: Set[str]) -> None:
     try:
         with open(log_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -16,12 +17,13 @@ def process_log_file(log_path: str) -> None:
                     continue
                 timestamp, ip, message = parsed
 
-                if ip in whitelist:
+                # 2. Corrigido: verificar se o IP está no CONJUNTO recebido, não no módulo
+                if ip in whitelist_set:
                     continue
                 try:
                     event = classify_event(timestamp, ip, message)
                     if event:
-                        analyzer.add_event(event)
+                        print(event)
                 except ValueError as e:
                     pass    
     except FileNotFoundError:
@@ -30,7 +32,6 @@ def process_log_file(log_path: str) -> None:
     except Exception as e:
         print(f"Erro inesperado ao processar ficheiro: {e}")
         sys.exit(1)
-
 
 
 def parse_log_line(line: str) -> Optional[tuple]:

@@ -1,3 +1,6 @@
+from typing import Optional, Set
+from models import LogEvent, SqlInjectionEvent, AuthFailureEvent, PortScanEvent
+
 def classify_event(timestamp: str, ip: str, message: str) -> Optional[LogEvent]:
     msg_lower = message.lower()
     if any(keyword in msg_lower for keyword in ['syntax error', 'union select', 'drop table']):
