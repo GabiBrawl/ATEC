@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import List, Type
 
+from analyzer import ThreatAnalyzer
 import processor
 import whitelist
 from models import AuthFailureEvent, LogEvent, PortScanEvent, SqlInjectionEvent
@@ -18,6 +19,7 @@ def display_menu() -> None:
     print("2. Listagem global de ameacas")
     print("3. Listagem filtrada por categoria")
     print("4. Monitorizacao global de estado")
+    print("5. Origens de forca bruta")
     print("0. Sair")
     print("-" * 50)
 
@@ -65,7 +67,7 @@ def list_events_by_category(events: List[LogEvent]) -> None:
 
 
 def main() -> None:
-    loaded_events: List[LogEvent] = []
+    analyzer = ThreatAnalyzer()
 
     while True:
         display_menu()
@@ -81,18 +83,45 @@ def main() -> None:
                 continue
 
             ips_permitidos = whitelist.load(whitelist_path)
-            loaded_events = processor.process_log_file(log_path, ips_permitidos, echo=False)
-            print(f"Ficheiros carregados com sucesso. Ameacas detetadas: {len(loaded_events)}")
+            analyzer.load_from_file(log_path, ips_permitidos, reset=True)
+            print(f"Ficheiros carregados com sucesso. Ameacas detetadas: {analyzer.get_total_events()}")
             print(f"Total global de ameacas na sessao: {LogEvent.get_total_threats()}")
+            if analyzer.has_brute_force_alerts():
+                print("Alertas de forca bruta detetados nas seguintes origens:")
+                for ip in analyzer.get_brute_force_ips():
+                    print(f"- {ip}")
 
         elif option == "2":
-            list_events(loaded_events)
+            list_events(analyzer.list_events())
 
         elif option == "3":
-            list_events_by_category(loaded_events)
+            list_events_by_category(analyzer.list_events())
 
         elif option == "4":
             print(f"Total global de ameacas na sessao: {LogEvent.get_total_threats()}")
+
+            traffic_by_ip = analyzer.get_traffic_by_ip()
+            if traffic_by_ip:
+                print("Volume de trafego por IP:")
+                for ip, volume in sorted(traffic_by_ip.items()):
+                    print(f"- {ip}: {volume}")
+            else:
+                print("Nao existem eventos carregados.")
+
+            auth_failures_by_ip = analyzer.get_auth_failures_by_ip()
+            if auth_failures_by_ip:
+                print("Falhas de autenticacao por IP:")
+                for ip, failures in sorted(auth_failures_by_ip.items()):
+                    print(f"- {ip}: {failures}")
+
+        elif option == "5":
+            brute_force_ips = analyzer.get_brute_force_ips()
+            if not brute_force_ips:
+                print("Nao existem origens classificadas como forca bruta.")
+            else:
+                print("Origens classificadas como forca bruta:")
+                for ip in brute_force_ips:
+                    print(f"- {ip}")
 
         elif option == "0":
             print("A terminar...")
