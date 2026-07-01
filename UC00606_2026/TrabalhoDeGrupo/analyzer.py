@@ -49,6 +49,11 @@ class ThreatAnalyzer:
 	def list_events_by_type(self, event_type: Type[LogEvent]) -> List[LogEvent]:
 		return [event for event in self._events if isinstance(event, event_type)]
 
+	def get_incidents_by_ip(self, ip: str) -> List[LogEvent]:
+		"""Devolve o histórico de incidentes de um IP ordenado por risco desc e timestamp desc."""
+		filtered_events = [event for event in self._events if event.ip == ip]
+		return sorted(filtered_events, key=lambda event: (event.get_risk(), event.timestamp), reverse=True)
+
 	def get_traffic_by_ip(self) -> Dict[str, int]:
 		return dict(self._traffic_by_ip)
 

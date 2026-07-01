@@ -7,9 +7,10 @@ import whitelist
 from models import AuthFailureEvent, LogEvent, PortScanEvent, SqlInjectionEvent
 
 
-whitelist_path = "/home/gabi/GitHub/ATEC/UC00606_2026/TrabalhoDeGrupo/txts/whilelist_1.txt"
-log_path = "/home/gabi/GitHub/ATEC/UC00606_2026/TrabalhoDeGrupo/txts/input_1.txt"
-
+#whitelist_path = "/home/gabi/GitHub/ATEC/UC00606_2026/TrabalhoDeGrupo/txts/whilelist_1.txt"
+#log_path = "/home/gabi/GitHub/ATEC/UC00606_2026/TrabalhoDeGrupo/txts/input_1.txt"
+whitelist_path = "C:\\Users\\ruijo\\ATEC\\UC00606_2026\\TrabalhoDeGrupo\\txts\\whilelist_1.txt"
+log_path = "C:\\Users\\ruijo\\ATEC\\UC00606_2026\\TrabalhoDeGrupo\\txts\\input_1.txt"
 
 def display_menu() -> None:
     print("\n" + "=" * 50)
@@ -20,6 +21,7 @@ def display_menu() -> None:
     print("3. Listagem filtrada por categoria")
     print("4. Monitorizacao global de estado")
     print("5. Origens de forca bruta")
+    print("6. Pesquisa isolada por IP")
     print("0. Sair")
     print("-" * 50)
 
@@ -122,6 +124,16 @@ def main() -> None:
                 print("Origens classificadas como forca bruta:")
                 for ip in brute_force_ips:
                     print(f"- {ip}")
+
+        elif option == "6":
+            ip = input("IP para pesquisa: ").strip()
+            incidents = analyzer.get_incidents_by_ip(ip)
+            if not incidents:
+                print(f"Nao existem incidentes associados ao IP {ip}.")
+            else:
+                print(f"\n--- INCIDENTES PARA {ip} ---")
+                for idx, event in enumerate(incidents, start=1):
+                    print(f"{idx}. {event}")
 
         elif option == "0":
             print("A terminar...")
