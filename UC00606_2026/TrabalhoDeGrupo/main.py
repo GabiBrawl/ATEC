@@ -2,6 +2,8 @@
 from typing import List, Type
 
 from analyzer import ThreatAnalyzer
+import os
+import tempfile
 import processor
 import whitelist
 from models import AuthFailureEvent, LogEvent, PortScanEvent, SqlInjectionEvent
@@ -136,6 +138,61 @@ def main() -> None:
                     print(f"{idx}. {event}")
 
         elif option == "0":
+            # UC12: exportar relatorio antes de terminar
+            report_name = "report.txt"
+            try:
+                events = analyzer.list_events()
+                total_threats = LogEvent.get_total_threats()
+
+                # IPs de forca bruta
+                brute_force_ips = analyzer.get_brute_force_ips()
+
+                # Calcular risco global acumulado por IP
+                risk_by_ip = {}
+                for ev in events:
+                    risk_by_ip[ev.ip] = risk_by_ip.get(ev.ip, 0) + ev.get_risk()
+
+                top3 = sorted(risk_by_ip.items(), key=lambda kv: kv[1], reverse=True)[:3]
+
+                # Escrever de forma atomica para evitar corrupcao: gravar em ficheiro temporario e mover
+                tmp = tempfile.NamedTemporaryFile(mode="w", delete=False, prefix="report_", suffix=".tmp", encoding="utf8")
+                try:
+                    with tmp as f:
+                        f.write("RELATORIO FINAL\n")
+                        f.write("================\n\n")
+                        f.write(f"Total absoluto de ameaacas instanciadas/processadas na sessao: {total_threats}\n\n")
+
+                        f.write("IPs catalogados como ataques de forca bruta:\n")
+                        if brute_force_ips:
+                            for ip in brute_force_ips:
+                                f.write(f"- {ip}\n")
+                        else:
+                            f.write("- (nenhum)\n")
+                        f.write("\n")
+
+                        f.write("Top 3 IPs por risco global acumulado:\n")
+                        if top3:
+                            for idx, (ip, score) in enumerate(top3, start=1):
+                                f.write(f"{idx}. {ip} -> Severidade acumulada: {score}\n")
+                        else:
+                            f.write("- (nenhum)\n")
+                except Exception:
+                    try:
+                        os.unlink(tmp.name)
+                    except Exception:
+                        pass
+                    raise
+
+                # Mover tmp para ficheiro final (substituicao atomica quando possivel)
+                try:
+                    os.replace(tmp.name, os.path.join(os.getcwd(), report_name))
+                    print(f"Relatorio exportado para {os.path.join(os.getcwd(), report_name)}")
+                except Exception as e:
+                    print(f"Erro ao finalizar exportacao do relatorio: {e}")
+
+            except Exception as e:
+                print(f"Erro ao gerar relatorio: {e}")
+
             print("A terminar...")
             break
 
