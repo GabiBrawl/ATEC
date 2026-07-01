@@ -11,8 +11,8 @@ from models import AuthFailureEvent, LogEvent, PortScanEvent, SqlInjectionEvent
 
 #whitelist_path = "/home/gabi/GitHub/ATEC/UC00606_2026/TrabalhoDeGrupo/txts/whilelist_1.txt"
 #log_path = "/home/gabi/GitHub/ATEC/UC00606_2026/TrabalhoDeGrupo/txts/input_1.txt"
-whitelist_path = "C:\\Users\\ruijo\\ATEC\\UC00606_2026\\TrabalhoDeGrupo\\txts\\whilelist_1.txt"
-log_path = "C:\\Users\\ruijo\\ATEC\\UC00606_2026\\TrabalhoDeGrupo\\txts\\input_1.txt"
+#whitelist_path = "C:\\Users\\ruijo\\ATEC\\UC00606_2026\\TrabalhoDeGrupo\\txts\\whilelist_1.txt"
+#log_path = "C:\\Users\\ruijo\\ATEC\\UC00606_2026\\TrabalhoDeGrupo\\txts\\input_1.txt"
 
 def display_menu() -> None:
     print("\n" + "=" * 50)
@@ -72,6 +72,14 @@ def list_events_by_category(events: List[LogEvent]) -> None:
 
 def main() -> None:
     analyzer = ThreatAnalyzer()
+
+    # Pedir ao utilizador os caminhos dos ficheiros (obrigatorio fornecer)
+    try:
+        whitelist_path = input("Introduza o caminho da whitelist: ").strip()
+        log_path = input("Introduza o caminho do ficheiro de logs: ").strip()
+    except KeyboardInterrupt:
+        print("\nInterrompido pelo utilizador. A terminar...")
+        return
 
     while True:
         display_menu()
