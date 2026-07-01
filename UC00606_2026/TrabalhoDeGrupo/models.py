@@ -13,6 +13,16 @@ class LogEvent:
 
         if type(self) is not LogEvent:
             LogEvent.total_threats += 1
+
+    @classmethod
+    def get_total_threats(cls) -> int:
+        """Retorna o total absoluto de ameaças instanciadas na sessão."""
+        return cls.total_threats
+
+    @classmethod
+    def reset_total_threats(cls) -> None:
+        """Reinicia o contador global de ameaças da sessão atual."""
+        cls.total_threats = 0
         
     @staticmethod
     def _validate_ip(ip: str) -> str:

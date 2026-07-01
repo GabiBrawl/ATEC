@@ -17,6 +17,7 @@ def display_menu() -> None:
     print("1. Carregar ficheiros")
     print("2. Listagem global de ameacas")
     print("3. Listagem filtrada por categoria")
+    print("4. Monitorizacao global de estado")
     print("0. Sair")
     print("-" * 50)
 
@@ -82,12 +83,16 @@ def main() -> None:
             ips_permitidos = whitelist.load(whitelist_path)
             loaded_events = processor.process_log_file(log_path, ips_permitidos, echo=False)
             print(f"Ficheiros carregados com sucesso. Ameacas detetadas: {len(loaded_events)}")
+            print(f"Total global de ameacas na sessao: {LogEvent.get_total_threats()}")
 
         elif option == "2":
             list_events(loaded_events)
 
         elif option == "3":
             list_events_by_category(loaded_events)
+
+        elif option == "4":
+            print(f"Total global de ameacas na sessao: {LogEvent.get_total_threats()}")
 
         elif option == "0":
             print("A terminar...")
