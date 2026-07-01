@@ -1,10 +1,12 @@
 import re
 import sys
-from typing import Optional, Set  
+from typing import Optional, Set, List
 import whitelist
 from classify import classify_event
+from models import LogEvent
 
-def process_log_file(log_path: str, whitelist_set: Set[str]) -> None:
+def process_log_file(log_path: str, whitelist_set: Set[str], echo: bool = False) -> List[LogEvent]:
+    events: List[LogEvent] = []
     try:
         with open(log_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -21,9 +23,12 @@ def process_log_file(log_path: str, whitelist_set: Set[str]) -> None:
                 try:
                     event = classify_event(timestamp, ip, message)
                     if event:
-                        print(event)
+                        events.append(event)
+                        if echo:
+                            print(event)
                 except ValueError as e:
                     pass    
+        return events
     except FileNotFoundError:
         print(f"Erro: Ficheiro '{log_path}' nao encontrado.")
         sys.exit(1)

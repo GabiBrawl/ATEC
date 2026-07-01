@@ -87,6 +87,16 @@ class AuthFailureEvent(LogEvent):
     def __str__(self) -> str:
         return f"[{self.timestamp}] {self.ip} -> AUTH FAILURE: {self.message} (Risco: {self.get_risk()})"
 
+    def __repr__(self) -> str:
+        return (
+            "AuthFailureEvent("
+            f"timestamp='{self.timestamp}', "
+            f"ip='{self.ip}', "
+            f"message='{self.message}', "
+            f"risk={self.get_risk()}"
+            ")"
+        )
+
 
 class SqlInjectionEvent(LogEvent):
     """Evento de tentativa de SQL Injection (Risco Base = 10)."""
@@ -102,6 +112,16 @@ class SqlInjectionEvent(LogEvent):
     def __str__(self) -> str:
         return f"[{self.timestamp}] {self.ip} -> SQL INJECTION: {self.message} (Risco: {self.get_risk()})"
 
+    def __repr__(self) -> str:
+        return (
+            "SqlInjectionEvent("
+            f"timestamp='{self.timestamp}', "
+            f"ip='{self.ip}', "
+            f"message='{self.message}', "
+            f"risk={self.get_risk()}"
+            ")"
+        )
+
 
 class PortScanEvent(LogEvent):
     """Evento de escaneamento de portas (Risco Base = 3)."""
@@ -116,3 +136,13 @@ class PortScanEvent(LogEvent):
 
     def __str__(self) -> str:
         return f"[{self.timestamp}] {self.ip} -> PORT SCAN: {self.message} (Risco: {self.get_risk()})"
+
+    def __repr__(self) -> str:
+        return (
+            "PortScanEvent("
+            f"timestamp='{self.timestamp}', "
+            f"ip='{self.ip}', "
+            f"message='{self.message}', "
+            f"risk={self.get_risk()}"
+            ")"
+        )
